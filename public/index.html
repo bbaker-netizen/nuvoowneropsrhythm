@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuvo — Weekly Operating Rhythm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#143d59;--navy-light:#1a5276;--navy-dark:#0e2a3f;--navy-90:rgba(20,61,89,.9);
+  --gold:#f6b51b;--gold-light:#f8c94b;--gold-dark:#d99a0a;--gold-10:rgba(246,181,27,.1);--gold-20:rgba(246,181,27,.2);
+  --white:#ffffff;--off-white:#fafaf8;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g400:#9ca3af;--g500:#6b7280;--g600:#4b5563;--g700:#374151;--g800:#1f2937;
+  --green:#059669;--green-light:#d1fae5;--red:#dc2626;--red-light:#fee2e2;--amber:#d97706;--amber-light:#fef3c7;
+  --r:8px;--r-lg:12px;--r-xl:16px;
+  --sh:0 1px 3px rgba(0,0,0,.08);--sh-md:0 4px 12px rgba(0,0,0,.08);--sh-lg:0 10px 25px rgba(0,0,0,.12);
+  --ease:200ms ease;
+}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--off-white);color:var(--g800);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{color:var(--navy);text-decoration:none}
+input,textarea,select,button{font-family:inherit;font-size:inherit}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
+
+/* ═══ LOGIN ═══ */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy-dark) 0%,var(--navy) 60%,var(--navy-light) 100%);position:relative;overflow:hidden}
+.login-wrap::before{content:'';position:absolute;top:-40%;right:-20%;width:70vw;height:70vw;border-radius:50%;background:radial-gradient(circle,rgba(246,181,27,.06) 0%,transparent 70%)}
+.login-wrap::after{content:'';position:absolute;bottom:-30%;left:-15%;width:50vw;height:50vw;border-radius:50%;background:radial-gradient(circle,rgba(246,181,27,.04) 0%,transparent 70%)}
+.login-card{background:var(--white);border-radius:var(--r-xl);padding:48px 40px;width:400px;max-width:90vw;box-shadow:var(--sh-lg);text-align:center;position:relative;z-index:1}
+.login-card h1{font-size:28px;font-weight:700;color:var(--navy);margin-bottom:4px;letter-spacing:-.5px}
+.login-card .sub{font-size:14px;color:var(--g500);margin-bottom:32px}
+.login-card .gold-line{width:48px;height:3px;background:var(--gold);border-radius:2px;margin:0 auto 24px}
+.partner-btn{width:100%;padding:16px 20px;border:2px solid var(--g200);border-radius:var(--r-lg);background:var(--white);cursor:pointer;display:flex;align-items:center;gap:14px;margin-bottom:12px;transition:all var(--ease)}
+.partner-btn:hover{border-color:var(--gold);background:var(--gold-10);transform:translateY(-1px);box-shadow:var(--sh)}
+.partner-btn .avatar{width:44px;height:44px;border-radius:50%;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0}
+.partner-btn .info{text-align:left}
+.partner-btn .info .name{font-weight:600;font-size:16px;color:var(--g800)}
+.partner-btn .info .role{font-size:13px;color:var(--g500)}
+
+/* ═══ SHELL ═══ */
+.shell{min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--navy);color:var(--white);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.topbar .brand{font-weight:700;font-size:18px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+.topbar .brand .mark{color:var(--gold)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar .user-pill{background:rgba(255,255,255,.12);border-radius:20px;padding:6px 14px 6px 8px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.topbar .user-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.topbar .logout-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;transition:all var(--ease)}
+.topbar .logout-btn:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
+
+/* ═══ NAV TABS ═══ */
+.nav-tabs{background:var(--white);border-bottom:1px solid var(--g200);display:flex;padding:0 24px;gap:0}
+.nav-tab{padding:14px 20px;font-size:14px;font-weight:500;color:var(--g500);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--ease);user-select:none}
+.nav-tab:hover{color:var(--g700)}
+.nav-tab.active{color:var(--navy);border-bottom-color:var(--gold);font-weight:600}
+
+/* ═══ CONTENT ═══ */
+.content{flex:1;padding:24px;max-width:860px;margin:0 auto;width:100%}
+
+/* ═══ DASHBOARD ═══ */
+.dash-hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);border-radius:var(--r-xl);padding:32px;color:var(--white);margin-bottom:24px;position:relative;overflow:hidden}
+.dash-hero::after{content:'';position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(246,181,27,.08)}
+.dash-hero h2{font-size:22px;font-weight:700;margin-bottom:6px}
+.dash-hero p{font-size:14px;opacity:.8;max-width:500px;line-height:1.5}
+.dash-hero .cta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;background:var(--gold);color:var(--navy);font-weight:600;font-size:14px;padding:10px 20px;border-radius:var(--r);border:none;cursor:pointer;transition:all var(--ease)}
+.dash-hero .cta:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:var(--sh)}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--white);border-radius:var(--r-lg);padding:20px;border:1px solid var(--g200);box-shadow:var(--sh)}
+.stat-card .label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--g500);margin-bottom:8px}
+.stat-card .value{font-size:28px;font-weight:700;color:var(--navy)}
+.stat-card .sub{font-size:12px;color:var(--g400);margin-top:4px}
+
+/* ═══ FORM ═══ */
+.form-card{background:var(--white);border-radius:var(--r-xl);border:1px solid var(--g200);box-shadow:var(--sh);overflow:hidden;margin-bottom:24px}
+.form-header{padding:24px 28px 20px;border-bottom:1px solid var(--g100)}
+.form-header .step-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gold-dark);margin-bottom:4px}
+.form-header h3{font-size:20px;font-weight:700;color:var(--navy)}
+.form-header p{font-size:14px;color:var(--g500);margin-top:4px;line-height:1.5}
+.form-body{padding:24px 28px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--g700);margin-bottom:6px}
+.form-group .hint{font-size:12px;color:var(--g400);margin-bottom:8px;line-height:1.4;font-style:italic}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-size:14px;color:var(--g800);transition:border-color var(--ease);background:var(--white);outline:none}
+.form-input:focus{border-color:var(--navy)}
+.form-input::placeholder{color:var(--g400)}
+textarea.form-input{min-height:80px;resize:vertical;line-height:1.5}
+select.form-input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+/* ═══ VOICE INPUT ═══ */
+.voice-wrap{position:relative}
+.voice-wrap .form-input{padding-right:48px}
+.mic-btn{position:absolute;right:8px;top:8px;width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--ease);background:var(--g100);color:var(--g500)}
+.mic-btn:hover{background:var(--g200)}
+.mic-btn.listening{background:var(--red-light);color:var(--red);animation:pulse-mic 1.5s ease infinite}
+.mic-btn.processing{background:var(--gold-10);color:var(--gold-dark)}
+.mic-btn.done{background:var(--green-light);color:var(--green)}
+.mic-btn.error{background:var(--red-light);color:var(--red)}
+@keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+.mic-btn svg{width:16px;height:16px}
+.mic-btn .spinner-sm{width:16px;height:16px;border:2px solid var(--gold-20);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══ COACH TIP ═══ */
+.coach-tip{background:var(--gold-10);border-left:3px solid var(--gold);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin-bottom:20px;font-size:13px;line-height:1.5;color:var(--g700)}
+.coach-tip strong{color:var(--navy);font-weight:600}
+.coach-tip .identity{color:var(--gold-dark);font-weight:600;font-style:italic}
+
+/* ═══ PRIORITY PILLS ═══ */
+.priority-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.priority-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid var(--g200);background:var(--white);color:var(--g600);transition:all var(--ease);user-select:none}
+.priority-pill:hover{border-color:var(--g300)}
+.priority-pill.selected{border-color:var(--navy);background:var(--navy);color:var(--white)}
+.priority-pill[data-color="revenue"].selected{background:#fdab3d;border-color:#fdab3d;color:#fff}
+.priority-pill[data-color="cash"].selected{background:#00c875;border-color:#00c875;color:#fff}
+.priority-pill[data-color="ops"].selected{background:#df2f4a;border-color:#df2f4a;color:#fff}
+.priority-pill[data-color="leadership"].selected{background:#007eb5;border-color:#007eb5;color:#fff}
+.priority-pill[data-color="focus"].selected{background:#143d59;border-color:#143d59;color:#fff}
+
+/* ═══ STEPPER ═══ */
+.stepper{display:flex;align-items:center;justify-content:center;gap:0;padding:20px 28px;border-bottom:1px solid var(--g100)}
+.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid var(--g300);color:var(--g400);background:var(--white);transition:all var(--ease);flex-shrink:0}
+.step-dot.active{border-color:var(--navy);background:var(--navy);color:var(--white)}
+.step-dot.done{border-color:var(--green);background:var(--green-light);color:var(--green)}
+.step-line{width:32px;height:2px;background:var(--g200);flex-shrink:0}
+.step-line.done{background:var(--green)}
+
+/* ═══ BUTTONS ═══ */
+.btn-row{display:flex;justify-content:space-between;padding:20px 28px;border-top:1px solid var(--g100);gap:12px}
+.btn{padding:10px 24px;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all var(--ease);display:inline-flex;align-items:center;gap:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--navy);color:var(--white)}
+.btn-primary:hover:not(:disabled){background:var(--navy-light);transform:translateY(-1px);box-shadow:var(--sh)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover:not(:disabled){background:var(--gold-light)}
+.btn-ghost{background:none;color:var(--g500);border:1px solid var(--g200)}
+.btn-ghost:hover{background:var(--g50);color:var(--g700)}
+.btn-danger{background:var(--red);color:var(--white)}
+
+/* ═══ REVIEW STEP ═══ */
+.review-section{padding:16px;background:var(--g50);border-radius:var(--r);margin-bottom:12px}
+.review-section .r-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--g400);margin-bottom:4px}
+.review-section .r-value{font-size:14px;color:var(--g800);line-height:1.5}
+.review-section .r-priority{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;margin-bottom:4px}
+.ai-summary-box{background:var(--gold-10);border:1.5px solid var(--gold);border-radius:var(--r-lg);padding:20px;margin-top:16px}
+.ai-summary-box h4{font-size:14px;font-weight:700;color:var(--gold-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-summary-box p{font-size:14px;color:var(--g700);line-height:1.6}
+.ai-summary-box .loading{display:flex;align-items:center;gap:10px;color:var(--g500);font-size:13px}
+
+/* ═══ HISTORY ═══ */
+.history-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r-lg);padding:20px;margin-bottom:12px;box-shadow:var(--sh);cursor:pointer;transition:all var(--ease)}
+.history-card:hover{border-color:var(--g300);box-shadow:var(--sh-md)}
+.history-card .h-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.history-card .h-week{font-size:15px;font-weight:700;color:var(--navy)}
+.history-card .h-status{font-size:11px;font-weight:600;padding:4px 10px;border-radius:10px}
+.history-card .h-status.submitted{background:var(--green-light);color:var(--green)}
+.history-card .h-status.scored{background:var(--gold-10);color:var(--gold-dark)}
+.history-card .h-outcomes{font-size:13px;color:var(--g600);line-height:1.5}
+.history-card .h-score{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:13px;font-weight:600;color:var(--navy)}
+.expand-detail{background:var(--g50);border-radius:var(--r);padding:16px;margin-top:12px;font-size:13px;line-height:1.6;color:var(--g700)}
+.expand-detail .d-row{margin-bottom:8px}
+.expand-detail .d-label{font-weight:600;color:var(--g500);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+
+/* ═══ SIDE-BY-SIDE COMPARISON ═══ */
+.sbs-section{margin-top:32px;padding-top:24px;border-top:2px dashed var(--g200)}
+.sbs-section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:12px}
+.sbs-section-header h3{font-size:18px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
+.sbs-section-header .sbs-sub{font-size:13px;color:var(--g500);margin-bottom:20px;line-height:1.5}
+.sbs-print-btn{background:var(--gold);color:var(--navy);border:none;border-radius:var(--r);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all var(--ease)}
+.sbs-print-btn:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:var(--sh)}
+.sbs-week-block{margin-bottom:24px;page-break-inside:avoid;break-inside:avoid}
+.sbs-week-title{font-size:14px;font-weight:700;color:var(--navy);background:var(--navy);color:var(--white);padding:8px 14px;border-radius:var(--r) var(--r) 0 0;letter-spacing:.3px}
+.sbs-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--g200);border-top:none;border-radius:0 0 var(--r) var(--r);overflow:hidden;background:var(--white)}
+.sbs-col{padding:16px;border-right:1px solid var(--g200)}
+.sbs-col:last-child{border-right:none}
+.sbs-col-header{font-size:12px;font-weight:700;color:var(--gold-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--gold)}
+.sbs-field{margin-bottom:10px;font-size:12px;line-height:1.45}
+.sbs-field-label{font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.sbs-field-value{color:var(--g800);white-space:pre-wrap;word-break:break-word}
+.sbs-field-empty{color:var(--g400);font-style:italic;font-size:11px}
+.sbs-priority{display:inline-block;padding:1px 8px;border-radius:8px;font-size:10px;font-weight:600;color:#fff;margin-left:6px;vertical-align:middle}
+.sbs-chair{margin-top:8px;padding:8px 10px;background:rgba(246,181,27,.08);border-left:3px solid var(--gold);border-radius:0 var(--r) var(--r) 0;font-size:11px;line-height:1.4}
+.sbs-chair-label{font-weight:700;color:var(--gold-dark);text-transform:uppercase;letter-spacing:.4px;font-size:10px;margin-bottom:3px}
+.sbs-meta{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap}
+.sbs-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px}
+.sbs-tag.held{background:var(--green-light);color:var(--green)}
+.sbs-tag.missed{background:var(--red-light);color:var(--red)}
+.sbs-tag.partial{background:var(--amber-light);color:var(--amber)}
+.sbs-tag.success{background:var(--green-light);color:var(--green)}
+.sbs-tag.fail{background:var(--red-light);color:var(--red)}
+.sbs-empty-col{color:var(--g400);font-style:italic;font-size:12px;padding:20px;text-align:center;background:var(--g50);border-radius:var(--r)}
+
+/* ═══ PRINT ═══ */
+@media print{
+  body{background:#fff !important;font-size:11px}
+  .topbar,.nav-tabs,.toast,.no-print,.sbs-print-btn,.history-card{display:none !important}
+  .content{max-width:none !important;padding:0 !important;margin:0 !important}
+  .sbs-section{margin-top:0;padding-top:0;border-top:none;page-break-inside:auto}
+  .sbs-section-header h3{font-size:16px;color:var(--navy) !important}
+  .sbs-section-header .sbs-sub{font-size:11px}
+  .sbs-week-block{margin-bottom:14px;page-break-inside:avoid;break-inside:avoid}
+  .sbs-week-title{font-size:12px;padding:6px 10px;background:var(--navy) !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sbs-col{padding:10px}
+  .sbs-col-header{font-size:10px;border-bottom-color:var(--gold) !important}
+  .sbs-field{font-size:10px;margin-bottom:6px}
+  .sbs-field-label{font-size:8px}
+  .sbs-priority,.sbs-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:landscape;margin:0.4in}
+}
+
+/* ═══ SUCCESS ═══ */
+.success-screen{text-align:center;padding:60px 20px}
+.success-icon{width:72px;height:72px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px}
+.success-screen h2{font-size:24px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.success-screen p{font-size:15px;color:var(--g500);max-width:400px;margin:0 auto 24px;line-height:1.5}
+
+/* ═══ EMPTY ═══ */
+.empty-state{text-align:center;padding:48px 20px;color:var(--g400)}
+.empty-state .icon{font-size:40px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+
+/* ═══ TOAST ═══ */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--r);font-size:14px;font-weight:500;color:var(--white);box-shadow:var(--sh-lg);z-index:1000;animation:slide-up .3s ease}
+.toast.error{background:var(--red)}.toast.success{background:var(--green)}.toast.info{background:var(--navy)}
+@keyframes slide-up{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ═══ ENV BANNER ═══ */
+.env-banner{background:var(--amber-light);border:1px solid var(--amber);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--g700);line-height:1.5}
+
+/* ═══ SPINNER ═══ */
+.spinner{width:28px;height:28px;border:3px solid var(--g200);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:600px){
+  .content{padding:16px}
+  .login-card{padding:32px 24px}
+  .form-body,.form-header,.btn-row{padding-left:20px;padding-right:20px}
+  .stat-row{grid-template-columns:1fr 1fr}
+  .stepper{padding:16px 20px}
+  .dash-hero{padding:24px}
+}
+
+/* ═══ GRADING / FINALIZE ═══ */
+.grade-card{background:var(--white);border-radius:var(--r-lg);box-shadow:var(--sh);padding:20px 24px;margin-bottom:16px}
+.grade-card h4{font-size:15px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.grade-owner-tag{font-size:11px;font-weight:600;padding:2px 10px;border-radius:10px;background:var(--g100);color:var(--g600)}
+.grade-owner-tag.ben{background:#E2ECF7;color:#2C6CB0}
+.grade-owner-tag.conrad{background:#F8EFDB;color:#C8922A}
+.state-badge{font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:.4px}
+.state-badge.tentative{background:var(--amber-light);color:var(--amber)}
+.state-badge.final{background:var(--green-light);color:var(--green)}
+.grade-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.grade-pill{min-width:44px;text-align:center;padding:8px 10px;border:2px solid var(--g200);border-radius:var(--r);font-weight:700;font-size:14px;color:var(--g600);cursor:pointer;transition:all var(--ease);background:var(--white);user-select:none}
+.grade-pill:hover{border-color:var(--navy)}
+.grade-pill.selected{background:var(--navy);border-color:var(--navy);color:var(--gold)}
+.status-pills{display:flex;gap:6px;margin-top:6px}
+.status-pill{padding:8px 16px;border:2px solid var(--g200);border-radius:var(--r);font-weight:600;font-size:13px;color:var(--g600);cursor:pointer;transition:all var(--ease);background:var(--white);user-select:none}
+.status-pill.on.selected{background:var(--green-light);border-color:var(--green);color:var(--green)}
+.status-pill.off.selected{background:var(--red-light);border-color:var(--red);color:var(--red)}
+.grade-meta{font-size:12px;color:var(--g400);margin-top:8px}
+.grade-display{font-size:22px;font-weight:800;color:var(--navy)}
+.grading-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.grading-head h3{font-size:20px;font-weight:700;color:var(--navy)}
+.week-select{padding:8px 12px;border:2px solid var(--g200);border-radius:var(--r);background:var(--white);font-weight:600;color:var(--g700)}
+.section-label{font-size:12px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.6px;margin:20px 0 10px}
+.coach-link{display:block;margin:18px auto 0;background:none;border:none;color:var(--g400);font-size:12px;cursor:pointer;text-decoration:underline}
+.coach-link:hover{color:var(--navy)}
+.final-banner{background:var(--green-light);color:var(--green);border-radius:var(--r);padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:16px}
+.admin-field label{font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:4px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+@media(max-width:720px){.admin-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════
+const CONFIG = {
+  BOARD_ID: 18399091870,
+  PARTNERS: {
+    'Conrad': { id: '97207810', group: 'group_mm0a3p30', dropdownId: 0 },
+    'Ben':    { id: '96669726', group: 'group_mm0afymh', dropdownId: 1 }
+  },
+  COLUMNS: {
+    partner:    'dropdown_mm0a85s0',
+    weekOf:     'date_mm0a1xw9',
+    outcome1:   'long_text_mm0a5ey7',
+    o1Priority: 'color_mm0a82h0',
+    outcome2:   'long_text_mm0ajwcx',
+    o2Priority: 'color_mm0amk9f',
+    outcome3:   'long_text_mm0a7s9v',
+    o3Priority: 'color_mm0ad76m',
+    meeting:    'text_mm0af9s0',
+    delegation: 'long_text_mm0ayfqs',
+    risk:       'text_mm0akb4k',
+    support:    'long_text_mm0a1ps7',
+    score:      'color_mm0aea3x',
+    meetingHeld:'color_mm0acdg0',
+    delegResult:'color_mm0apkz7',
+    chairRuling:'color_mm0aprw2',
+    chairNotes: 'long_text_mm0azb2c',
+    status:     'color_mm0adk01',
+    aiSummary:  'long_text_mm0a6kfm'
+  },
+  PRIORITIES: [
+    { label: 'Revenue & Sales', mondayLabel: 'Revenue & Sales', color: 'revenue', hex: '#fdab3d' },
+    { label: 'Cash Flow & Finance', mondayLabel: 'Cash Flow & Finance', color: 'cash', hex: '#00c875' },
+    { label: 'Ops Excellence', mondayLabel: 'Ops Excellence', color: 'ops', hex: '#df2f4a' },
+    { label: 'Leadership Dev', mondayLabel: 'Leadership Dev', color: 'leadership', hex: '#007eb5' },
+    { label: 'Core Focus', mondayLabel: 'Core Focus', color: 'focus', hex: '#143d59' }
+  ]
+};
+
+// ════════════════════════════════════════
+// API HELPERS — Direct calls (no proxy needed)
+// Set these in the CONFIG below or via Netlify env vars
+// ════════════════════════════════════════
+const API_KEYS = {
+  // Tokens live server-side now (Netlify env vars). The /api/monday-proxy
+  // function holds the Monday.com token — never put a key in this file.
+  MONDAY_TOKEN: '',
+  ANTHROPIC_KEY: ''
+};
+
+async function mondayAPI(query, variables = {}) {
+  // Try proxy first, fall back to direct if token available
+  let result;
+  try {
+    const resp = await fetch('/api/monday-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables })
+    });
+    const text = await resp.text();
+    if (text.startsWith('<')) throw new Error('Proxy not available — got HTML instead of JSON');
+    result = JSON.parse(text);
+  } catch (proxyErr) {
+    console.warn('Proxy failed:', proxyErr.message, '— trying direct');
+    const token = API_KEYS.MONDAY_TOKEN;
+    if (!token) {
+      console.error('Monday proxy unavailable and no direct token set');
+      throw new Error('Cannot connect to Monday.com — proxy unavailable and no fallback token configured.');
+    }
+    const resp = await fetch('https://api.monday.com/v2', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': token, 'API-Version': '2024-10' },
+      body: JSON.stringify({ query, variables })
+    });
+    result = await resp.json();
+  }
+  // Check for Monday.com API errors
+  if (result.errors && result.errors.length > 0) {
+    const errMsg = result.errors.map(e => e.message).join('; ');
+    console.error('Monday.com API errors:', result.errors);
+    throw new Error('Monday.com error: ' + errMsg);
+  }
+  if (result.error_message) {
+    console.error('Monday.com error_message:', result.error_message);
+    throw new Error('Monday.com error: ' + result.error_message);
+  }
+  return result;
+}
+
+async function aiAPI(payload) {
+  // Try proxy first
+  try {
+    const resp = await fetch('/api/ai-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const text = await resp.text();
+    if (text.startsWith('<')) throw new Error('Proxy not available');
+    return JSON.parse(text);
+  } catch (proxyErr) {
+    // Proxy not deployed - return skipped
+    return { result: '', skipped: true, reason: 'proxy_unavailable' };
+  }
+}
+
+function getMonday(d = new Date()) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  date.setDate(diff);
+  return date.toISOString().split('T')[0];
+}
+
+function formatWeek(dateStr) {
+  if (!dateStr) return 'Unknown';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function extractColValue(item, colId) {
+  const col = item.column_values?.find(c => c.id === colId);
+  if (!col) return '';
+  if (col.text) return col.text;
+  if (col.value) {
+    try {
+      const v = JSON.parse(col.value);
+      if (v.text) return v.text;
+      if (v.label) return v.label;
+      if (v.ids) return v.ids;
+      if (v.date) return v.date;
+    } catch { return col.value; }
+  }
+  return '';
+}
+
+// ════════════════════════════════════════
+// PARTNERSHIP GRADING — config + API
+// Each owner grades ONLY the other owner's areas. Grades measure the
+// area's output, not the person. On/off track is independent of the letter.
+// ════════════════════════════════════════
+const GRADING = {
+  AREAS: [
+    { id: 'marketing',    name: 'Marketing Handoff',    owner: 'Ben',    grader: 'Conrad' },
+    { id: 'sales',        name: 'Sales',                owner: 'Ben',    grader: 'Conrad' },
+    { id: 'construction', name: 'Construction',         owner: 'Ben',    grader: 'Conrad' },
+    { id: 'financial',    name: 'Financial Management', owner: 'Conrad', grader: 'Ben' },
+    { id: 'production',   name: 'Production',           owner: 'Conrad', grader: 'Ben' },
+    { id: 'systems',      name: 'Systems',              owner: 'Conrad', grader: 'Ben' },
+    { id: 'admin',        name: 'Admin Support',        owner: 'Conrad', grader: 'Ben' }
+  ],
+  GRADES: ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-'],
+  STATUSES: ['On track', 'Off track']
+};
+
+async function gradingRequest(url, options, fallbackMsg) {
+  const resp = await fetch(url, options);
+  const text = await resp.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch { throw new Error('The grading service is not reachable right now. Try again in a minute.'); }
+  if (!resp.ok) throw new Error(data.error || fallbackMsg);
+  return data;
+}
+function gradingGET(week) {
+  return gradingRequest('/api/grading?week=' + week, undefined, 'Could not load grading data');
+}
+function gradingPOST(payload) {
+  return gradingRequest('/api/grading', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }, 'Save failed');
+}
+function finalizeAPI(payload) {
+  return gradingRequest('/api/finalize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }, 'Request failed');
+}
+
+// ════════════════════════════════════════
+// VOICE INPUT COMPONENT
+// ════════════════════════════════════════
+function VoiceInput({ value, onChange, placeholder, fieldName, multiline = false }) {
+  const [status, setStatus] = useState('idle'); // idle, listening, processing, done, error, unsupported
+  const recognitionRef = useRef(null);
+  const valueRef = useRef(value);
+  const transcriptBuffer = useRef('');
+  const cleanupTimer = useRef(null);
+  const supported = typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
+
+  // Keep ref in sync with prop
+  useEffect(() => { valueRef.current = value; }, [value]);
+
+  // CRITICAL: Stop recording when component unmounts (e.g. user navigates to next step)
+  useEffect(() => {
+    return () => {
+      if (cleanupTimer.current) clearTimeout(cleanupTimer.current);
+      const rec = recognitionRef.current;
+      recognitionRef.current = null;
+      if (rec) { try { rec.stop(); } catch {} }
+    };
+  }, []);
+
+  const formatTranscript = useCallback((rawText) => {
+    if (!rawText.trim()) return;
+    // Client-side cleanup: capitalize, fix spacing, add punctuation
+    let text = rawText.trim();
+    // Collapse multiple spaces
+    text = text.replace(/\s{2,}/g, ' ');
+    // Capitalize first letter
+    text = text.charAt(0).toUpperCase() + text.slice(1);
+    // Capitalize after sentence-ending punctuation
+    text = text.replace(/([.!?])\s+([a-z])/g, (_, p, c) => p + ' ' + c.toUpperCase());
+    // If no ending punctuation, add a period
+    if (!/[.!?]$/.test(text)) text += '.';
+    onChange(text);
+    setStatus('done');
+    setTimeout(() => setStatus('idle'), 1000);
+    transcriptBuffer.current = '';
+  }, [onChange]);
+
+  const startListening = useCallback(() => {
+    if (!supported) { setStatus('unsupported'); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-CA';
+    recognitionRef.current = recognition;
+    transcriptBuffer.current = '';
+
+    // Capture the starting value when recording begins
+    const startingValue = valueRef.current || '';
+
+    recognition.onresult = (event) => {
+      // Build the FULL transcript from all results so far
+      let finalText = '';
+      let interimText = '';
+      for (let i = 0; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalText += event.results[i][0].transcript;
+        } else {
+          interimText += event.results[i][0].transcript;
+        }
+      }
+
+      // Show real-time preview: starting value + everything said so far
+      const livePreview = startingValue
+        ? startingValue + ' ' + finalText + interimText
+        : finalText + interimText;
+      onChange(livePreview);
+
+      // Update buffer with all final text
+      transcriptBuffer.current = finalText;
+
+      // Reset the format debounce timer — wait for a pause in speech
+      if (cleanupTimer.current) clearTimeout(cleanupTimer.current);
+      if (finalText.trim()) {
+        cleanupTimer.current = setTimeout(() => {
+          // After 2s of silence with final results, format the transcript
+          const fullText = startingValue
+            ? startingValue + ' ' + transcriptBuffer.current
+            : transcriptBuffer.current;
+          formatTranscript(fullText);
+        }, 2000);
+      }
+    };
+
+    recognition.onerror = (e) => {
+      if (e.error === 'no-speech') return; // Ignore no-speech, keep listening
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 2000);
+    };
+
+    recognition.onend = () => {
+      // If we're still supposed to be listening (continuous mode sometimes stops), restart
+      if (recognitionRef.current && status === 'listening') {
+        try { recognition.start(); } catch { /* already started */ }
+      }
+    };
+
+    recognition.start();
+    setStatus('listening');
+  }, [supported, onChange, formatTranscript, status]);
+
+  const stopListening = useCallback(() => {
+    if (cleanupTimer.current) clearTimeout(cleanupTimer.current);
+    const recognition = recognitionRef.current;
+    recognitionRef.current = null;
+    if (recognition) recognition.stop();
+
+    // Run final formatting on any remaining buffered transcript
+    if (transcriptBuffer.current.trim()) {
+      const startingValue = valueRef.current?.replace(transcriptBuffer.current, '').trim() || '';
+      const fullText = startingValue
+        ? startingValue + ' ' + transcriptBuffer.current
+        : transcriptBuffer.current;
+      formatTranscript(fullText);
+    } else {
+      setStatus('idle');
+    }
+  }, [formatTranscript]);
+
+  const toggleMic = () => { status === 'listening' ? stopListening() : startListening(); };
+
+  const Tag = multiline ? 'textarea' : 'input';
+  const micIcon = {
+    idle: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>,
+    listening: <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>,
+    processing: <div className="spinner-sm"/>,
+    done: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>,
+    error: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>,
+    unsupported: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+  };
+
+  return (
+    <div className="voice-wrap">
+      <Tag
+        className="form-input"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        rows={multiline ? 3 : undefined}
+      />
+      {supported && (
+        <button type="button" className={`mic-btn ${status}`} onClick={toggleMic} title={status === 'listening' ? 'Stop recording' : 'Start voice input'}>
+          {micIcon[status] || micIcon.idle}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
+// TOAST COMPONENT
+// ════════════════════════════════════════
+function Toast({ message, type, onClose }) {
+  useEffect(() => { if (message) { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); } }, [message]);
+  if (!message) return null;
+  return <div className={`toast ${type}`}>{message}</div>;
+}
+
+// ════════════════════════════════════════
+// LOGIN SCREEN
+// ════════════════════════════════════════
+function ScoreboardCard() {
+  const [hover, setHover] = React.useState(false);
+  return (
+    <a href="https://nuvoscorecard.netlify.app/" target="_blank" rel="noopener noreferrer"
+       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+       style={{ display: 'flex', alignItems: 'center', gap: 14, textDecoration: 'none', color: 'inherit',
+         background: hover ? 'var(--gold-10)' : 'var(--white)',
+         border: '2px solid ' + (hover ? 'var(--gold)' : 'var(--g200)'),
+         borderRadius: 'var(--r-lg)', padding: '16px 20px', marginTop: 20, width: '100%',
+         boxShadow: hover ? 'var(--sh)' : 'none',
+         transform: hover ? 'translateY(-1px)' : 'none', transition: 'all var(--ease)', cursor: 'pointer' }}>
+      <span style={{ flex: '0 0 auto', width: 44, height: 44, borderRadius: '50%', background: 'var(--navy)', color: 'var(--gold)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <line x1="6" y1="20" x2="6" y2="12" /><line x1="12" y1="20" x2="12" y2="6" /><line x1="18" y1="20" x2="18" y2="15" />
+        </svg>
+      </span>
+      <span style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+        <span style={{ fontWeight: 600, fontSize: 16, color: 'var(--g800)' }}>Partnership Scoreboard</span>
+        <span style={{ fontSize: 13, color: 'var(--g500)', marginTop: 2 }}>This week's grades and trend</span>
+      </span>
+      <span style={{ marginLeft: 'auto', color: 'var(--gold-dark)', fontSize: 20 }}>&rarr;</span>
+    </a>
+  );
+}
+
+function LoginScreen({ onSelect, onCoach }) {
+  return (
+    <div className="login-wrap">
+      <div className="login-card">
+        <h1>NUVO</h1>
+        <div className="sub">Weekly Operating Rhythm</div>
+        <div className="gold-line" />
+        <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 24 }}>Select your name to continue</p>
+        {Object.keys(CONFIG.PARTNERS).map(name => (
+          <button key={name} className="partner-btn" onClick={() => onSelect(name)}>
+            <div className="avatar">{name[0]}</div>
+            <div className="info">
+              <div className="name">{name === 'Conrad' ? 'Conrad Jones' : 'Ben Pond'}</div>
+              <div className="role">Co-Owner, Nuvo Construction</div>
+            </div>
+          </button>
+        ))}
+        <ScoreboardCard />
+        <button className="coach-link" onClick={onCoach}>Coach finalize</button>
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
+// DASHBOARD VIEW
+// ════════════════════════════════════════
+function DashboardView({ partner, items, onNewContract, loading }) {
+  const currentWeek = getMonday();
+  const hasThisWeek = items.some(item => {
+    const weekOf = extractColValue(item, CONFIG.COLUMNS.weekOf);
+    return weekOf === currentWeek;
+  });
+
+  const scoredItems = items.filter(i => {
+    const score = extractColValue(i, CONFIG.COLUMNS.score);
+    return score && score !== '';
+  });
+  const totalScore = scoredItems.reduce((sum, i) => {
+    const s = extractColValue(i, CONFIG.COLUMNS.score);
+    if (s.startsWith('3')) return sum + 3;
+    if (s.startsWith('2')) return sum + 2;
+    if (s.startsWith('1')) return sum + 1;
+    return sum;
+  }, 0);
+  const avgScore = scoredItems.length ? (totalScore / scoredItems.length).toFixed(1) : '—';
+
+  return (
+    <div>
+      <div className="dash-hero">
+        <h2>{hasThisWeek ? `Contract submitted for this week` : `Good ${new Date().getHours() < 12 ? 'morning' : 'afternoon'}, ${partner}`}</h2>
+        <p>{hasThisWeek
+          ? `Your weekly contract for the week of ${formatWeek(currentWeek)} has been submitted. Bruce will review on Friday.`
+          : `It's time to set your weekly commitments. CEOs don't react to the week — they design it.`}
+        </p>
+        {!hasThisWeek && (
+          <button className="cta" onClick={onNewContract}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Submit Weekly Contract
+          </button>
+        )}
+      </div>
+      <div className="stat-row">
+        <div className="stat-card">
+          <div className="label">Contracts Submitted</div>
+          <div className="value">{items.length}</div>
+          <div className="sub">all time</div>
+        </div>
+        <div className="stat-card">
+          <div className="label">Avg Outcome Score</div>
+          <div className="value">{avgScore}</div>
+          <div className="sub">{scoredItems.length} weeks scored</div>
+        </div>
+        <div className="stat-card">
+          <div className="label">This Week</div>
+          <div className="value" style={{ fontSize: 18, color: hasThisWeek ? '#059669' : '#dc2626' }}>{hasThisWeek ? '✓ Submitted' : '⚠ Pending'}</div>
+          <div className="sub">Week of {formatWeek(currentWeek)}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
+// HISTORY VIEW
+// ════════════════════════════════════════
+function HistoryView({ items, itemsByPartner, currentPartner }) {
+  const [expanded, setExpanded] = useState(null);
+  const sorted = [...items].sort((a, b) => {
+    const wa = extractColValue(a, CONFIG.COLUMNS.weekOf) || '';
+    const wb = extractColValue(b, CONFIG.COLUMNS.weekOf) || '';
+    return wb.localeCompare(wa);
+  });
+
+  const getPriorityHex = (label) => {
+    const p = CONFIG.PRIORITIES.find(pr => pr.mondayLabel === label);
+    return p ? p.hex : '#143d59';
+  };
+
+  // ── Build week-paired side-by-side data ──────────────────
+  // Normalize every weekOf to the Monday of its week so a Mon submission
+  // and a Tue submission within the same week pair together.
+  const normalizeWeek = (w) => {
+    if (!w) return '';
+    try { return getMonday(new Date(w + 'T00:00:00')); }
+    catch { return w; }
+  };
+  const conradItems = (itemsByPartner && itemsByPartner.Conrad) || [];
+  const benItems = (itemsByPartner && itemsByPartner.Ben) || [];
+  const weekSet = new Set();
+  [...conradItems, ...benItems].forEach(it => {
+    const w = normalizeWeek(extractColValue(it, CONFIG.COLUMNS.weekOf));
+    if (w) weekSet.add(w);
+  });
+  const weeks = [...weekSet].sort((a, b) => b.localeCompare(a));
+  const findFor = (partnerName, week) =>
+    (partnerName === 'Conrad' ? conradItems : benItems).find(
+      it => normalizeWeek(extractColValue(it, CONFIG.COLUMNS.weekOf)) === week
+    );
+
+  if (!sorted.length && !weeks.length) return (
+    <div className="empty-state"><div className="icon">📋</div><p>No contracts submitted yet. Start your first one from the Dashboard.</p></div>
+  );
+
+  const SbsCard = ({ partner, item }) => {
+    if (!item) return (
+      <div className="sbs-col">
+        <div className="sbs-col-header">{partner === 'Conrad' ? 'Conrad Jones' : 'Ben Pond'}</div>
+        <div className="sbs-empty-col">No contract submitted for this week</div>
+      </div>
+    );
+    const o1 = extractColValue(item, CONFIG.COLUMNS.outcome1);
+    const o2 = extractColValue(item, CONFIG.COLUMNS.outcome2);
+    const o3 = extractColValue(item, CONFIG.COLUMNS.outcome3);
+    const o1p = extractColValue(item, CONFIG.COLUMNS.o1Priority);
+    const o2p = extractColValue(item, CONFIG.COLUMNS.o2Priority);
+    const o3p = extractColValue(item, CONFIG.COLUMNS.o3Priority);
+    const meeting = extractColValue(item, CONFIG.COLUMNS.meeting);
+    const meetingHeld = extractColValue(item, CONFIG.COLUMNS.meetingHeld);
+    const delegation = extractColValue(item, CONFIG.COLUMNS.delegation);
+    const delegResult = extractColValue(item, CONFIG.COLUMNS.delegResult);
+    const risk = extractColValue(item, CONFIG.COLUMNS.risk);
+    const support = extractColValue(item, CONFIG.COLUMNS.support);
+    const score = extractColValue(item, CONFIG.COLUMNS.score);
+    const chairRuling = extractColValue(item, CONFIG.COLUMNS.chairRuling);
+    const chairNotes = extractColValue(item, CONFIG.COLUMNS.chairNotes);
+
+    const renderOutcome = (label, text, priority) => text && (
+      <div className="sbs-field">
+        <div className="sbs-field-label">{label}{priority && <span className="sbs-priority" style={{ background: getPriorityHex(priority) }}>{priority}</span>}</div>
+        <div className="sbs-field-value">{text}</div>
+      </div>
+    );
+
+    const renderTag = (val, type) => {
+      if (!val) return null;
+      let cls = 'sbs-tag';
+      const v = val.toLowerCase();
+      if (type === 'meeting') {
+        if (v === 'held') cls += ' held';
+        else if (v === 'missed') cls += ' missed';
+        else cls += ' partial';
+      } else {
+        if (v.includes('successfully')) cls += ' success';
+        else if (v.includes('not')) cls += ' fail';
+        else cls += ' partial';
+      }
+      return <span className={cls}>{val}</span>;
+    };
+
+    return (
+      <div className="sbs-col">
+        <div className="sbs-col-header">{partner === 'Conrad' ? 'Conrad Jones' : 'Ben Pond'}</div>
+        {renderOutcome('Outcome 1', o1, o1p)}
+        {renderOutcome('Outcome 2', o2, o2p)}
+        {renderOutcome('Outcome 3', o3, o3p)}
+        {meeting && (
+          <div className="sbs-field">
+            <div className="sbs-field-label">Non-Negotiable Meeting</div>
+            <div className="sbs-field-value">{meeting}</div>
+            {meetingHeld && <div className="sbs-meta">{renderTag(meetingHeld, 'meeting')}</div>}
+          </div>
+        )}
+        {delegation && (
+          <div className="sbs-field">
+            <div className="sbs-field-label">Delegation Commitment</div>
+            <div className="sbs-field-value">{delegation}</div>
+            {delegResult && <div className="sbs-meta">{renderTag(delegResult, 'deleg')}</div>}
+          </div>
+        )}
+        {risk && (
+          <div className="sbs-field">
+            <div className="sbs-field-label">Biggest Risk</div>
+            <div className="sbs-field-value">{risk}</div>
+          </div>
+        )}
+        {support && (
+          <div className="sbs-field">
+            <div className="sbs-field-label">Partner Support Needed</div>
+            <div className="sbs-field-value">{support}</div>
+          </div>
+        )}
+        {score && (
+          <div className="sbs-chair">
+            <div className="sbs-chair-label">Chair Review · Score {score}</div>
+            {chairRuling && <div><strong>Ruling:</strong> {chairRuling}</div>}
+            {chairNotes && <div style={{ marginTop: 2 }}>{chairNotes}</div>}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      {/* ── Side-by-Side Partner Comparison (TOP) ───────────── */}
+      <div className="sbs-section" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none' }}>
+        <div className="sbs-section-header no-print">
+          <div>
+            <h3>✦ Partner Comparison — Side-by-Side</h3>
+          </div>
+          <button className="sbs-print-btn" onClick={() => window.print()}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print Comparison
+          </button>
+        </div>
+        <p className="sbs-sub no-print">
+          Both Conrad's and Ben's weekly contracts paired by week — built for printing and reviewing together.
+        </p>
+        {weeks.length === 0 ? (
+          <div className="sbs-empty-col" style={{ marginTop: 12 }}>
+            No paired contracts yet. Once both partners have submitted, the comparison will appear here.
+          </div>
+        ) : (
+          weeks.map(week => (
+            <div key={week} className="sbs-week-block">
+              <div className="sbs-week-title">Week of {formatWeek(week)}</div>
+              <div className="sbs-grid">
+                <SbsCard partner="Conrad" item={findFor('Conrad', week)} />
+                <SbsCard partner="Ben" item={findFor('Ben', week)} />
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {sorted.length > 0 && (
+        <div className="no-print" style={{ marginTop: 32, paddingTop: 24, borderTop: '2px dashed var(--g200)' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Your Contract History</h3>
+          <p style={{ fontSize: 13, color: 'var(--g500)', marginBottom: 16, lineHeight: 1.5 }}>
+            Your individual weekly contracts. Tap a card to expand details.
+          </p>
+        </div>
+      )}
+      <div className="no-print">
+      {sorted.map(item => {
+        const weekOf = extractColValue(item, CONFIG.COLUMNS.weekOf);
+        const score = extractColValue(item, CONFIG.COLUMNS.score);
+        const outcome1 = extractColValue(item, CONFIG.COLUMNS.outcome1);
+        const outcome2 = extractColValue(item, CONFIG.COLUMNS.outcome2);
+        const outcome3 = extractColValue(item, CONFIG.COLUMNS.outcome3);
+        const o1Priority = extractColValue(item, CONFIG.COLUMNS.o1Priority);
+        const o2Priority = extractColValue(item, CONFIG.COLUMNS.o2Priority);
+        const o3Priority = extractColValue(item, CONFIG.COLUMNS.o3Priority);
+        const meeting = extractColValue(item, CONFIG.COLUMNS.meeting);
+        const delegation = extractColValue(item, CONFIG.COLUMNS.delegation);
+        const risk = extractColValue(item, CONFIG.COLUMNS.risk);
+        const support = extractColValue(item, CONFIG.COLUMNS.support);
+        const chairNotes = extractColValue(item, CONFIG.COLUMNS.chairNotes);
+        const chairRuling = extractColValue(item, CONFIG.COLUMNS.chairRuling);
+        const meetingHeld = extractColValue(item, CONFIG.COLUMNS.meetingHeld);
+        const delegResult = extractColValue(item, CONFIG.COLUMNS.delegResult);
+        const aiSummary = extractColValue(item, CONFIG.COLUMNS.aiSummary);
+        const isExpanded = expanded === item.id;
+
+        return (
+          <div key={item.id} className="history-card" onClick={() => setExpanded(isExpanded ? null : item.id)}>
+            <div className="h-top">
+              <div className="h-week">Week of {formatWeek(weekOf)}</div>
+              <div className={`h-status ${score ? 'scored' : 'submitted'}`}>{score ? 'Reviewed' : 'Submitted'}</div>
+            </div>
+
+            {/* Always visible: Outcomes with priorities */}
+            <div style={{ marginBottom: 12 }}>
+              {outcome1 && (
+                <div className="review-section" style={{ marginBottom: 8, padding: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span className="r-label" style={{ margin: 0 }}>Outcome 1</span>
+                    {o1Priority && <span className="r-priority" style={{ background: getPriorityHex(o1Priority), fontSize: 10, padding: '1px 8px' }}>{o1Priority}</span>}
+                  </div>
+                  <div className="r-value">{outcome1}</div>
+                </div>
+              )}
+              {outcome2 && (
+                <div className="review-section" style={{ marginBottom: 8, padding: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span className="r-label" style={{ margin: 0 }}>Outcome 2</span>
+                    {o2Priority && <span className="r-priority" style={{ background: getPriorityHex(o2Priority), fontSize: 10, padding: '1px 8px' }}>{o2Priority}</span>}
+                  </div>
+                  <div className="r-value">{outcome2}</div>
+                </div>
+              )}
+              {outcome3 && (
+                <div className="review-section" style={{ marginBottom: 8, padding: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span className="r-label" style={{ margin: 0 }}>Outcome 3</span>
+                    {o3Priority && <span className="r-priority" style={{ background: getPriorityHex(o3Priority), fontSize: 10, padding: '1px 8px' }}>{o3Priority}</span>}
+                  </div>
+                  <div className="r-value">{outcome3}</div>
+                </div>
+              )}
+            </div>
+
+            {/* Always visible: Meeting, Delegation, Risk, Support */}
+            <div className="expand-detail" style={{ marginTop: 0 }} onClick={e => e.stopPropagation()}>
+              {meeting && <div className="d-row"><div className="d-label">Non-Negotiable Meeting</div>{meeting}{meetingHeld && <span style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', borderRadius: 8, background: meetingHeld === 'Held' ? '#d1fae5' : meetingHeld === 'Missed' ? '#fee2e2' : '#fef3c7', color: meetingHeld === 'Held' ? '#059669' : meetingHeld === 'Missed' ? '#dc2626' : '#d97706' }}>{meetingHeld}</span>}</div>}
+              {delegation && <div className="d-row"><div className="d-label">Delegation Commitment</div>{delegation}{delegResult && <span style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', borderRadius: 8, background: delegResult.includes('Successfully') ? '#d1fae5' : delegResult.includes('Not') ? '#fee2e2' : '#fef3c7', color: delegResult.includes('Successfully') ? '#059669' : delegResult.includes('Not') ? '#dc2626' : '#d97706' }}>{delegResult}</span>}</div>}
+              {risk && <div className="d-row"><div className="d-label">Biggest Risk</div>{risk}</div>}
+              {support && <div className="d-row"><div className="d-label">Partner Support Needed</div>{support}</div>}
+            </div>
+
+            {/* Chair review section — if scored */}
+            {score && (
+              <div style={{ marginTop: 12, padding: 12, background: 'rgba(246,181,27,0.08)', borderRadius: 8, borderLeft: '3px solid #f6b51b' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#d99a0a', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.5px' }}>Chair Review</div>
+                <div className="h-score" style={{ margin: 0 }}>Outcome Score: {score}</div>
+                {chairRuling && <div style={{ fontSize: 13, marginTop: 4 }}><strong>Ruling:</strong> {chairRuling}</div>}
+                {chairNotes && <div style={{ fontSize: 13, marginTop: 4, color: '#4b5563' }}>{chairNotes}</div>}
+              </div>
+            )}
+
+            {/* AI Summary */}
+            {aiSummary && (
+              <div className="ai-summary-box" style={{ marginTop: 12 }}>
+                <h4>✦ AI Summary</h4>
+                <p>{aiSummary}</p>
+              </div>
+            )}
+
+            {/* Expand hint */}
+            {!isExpanded && <div style={{ textAlign: 'center', marginTop: 8, fontSize: 11, color: '#9ca3af' }}>— tap for full details —</div>}
+          </div>
+        );
+      })}
+      </div>
+
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
+// CONTRACT FORM
+// ════════════════════════════════════════
+function ContractForm({ partner, onSubmit, submitting, onCancel }) {
+  const [step, setStep] = useState(1);
+  const TOTAL = 6;
+  const [form, setForm] = useState({
+    outcome1: '', o1Priority: '',
+    outcome2: '', o2Priority: '',
+    outcome3: '', o3Priority: '',
+    meeting: '', delegation: '', risk: '', support: ''
+  });
+  const [aiSummary, setAiSummary] = useState('');
+
+  const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
+
+  const canNext = () => {
+    if (step === 1) return form.outcome1.trim() && form.o1Priority;
+    return true;
+  };
+
+  const goNext = () => {
+    if (step === 5) generateSummary();
+    setStep(s => Math.min(s + 1, TOTAL));
+  };
+  const goBack = () => setStep(s => Math.max(s - 1, 1));
+
+  const generateSummary = () => {
+    // Build a clean, formatted paragraph from the contract data — no AI needed
+    const outcomes = [
+      form.outcome1 && `${form.outcome1} (${form.o1Priority || 'No priority'})`,
+      form.outcome2 && `${form.outcome2} (${form.o2Priority || 'No priority'})`,
+      form.outcome3 && `${form.outcome3} (${form.o3Priority || 'No priority'})`
+    ].filter(Boolean);
+
+    let summary = `${partner}'s weekly contract for the week of ${getMonday()}.\n\n`;
+    
+    if (outcomes.length === 1) {
+      summary += `This week's single focus outcome is: ${outcomes[0]}.\n\n`;
+    } else {
+      summary += `This week's ${outcomes.length} committed outcomes are: ${outcomes.join('; ')}.\n\n`;
+    }
+
+    if (form.meeting) {
+      summary += `Non-negotiable meeting: ${form.meeting}. `;
+    }
+    if (form.delegation) {
+      summary += `Delegation commitment: ${form.delegation}. `;
+    }
+    if (form.meeting || form.delegation) summary += '\n\n';
+
+    if (form.risk) {
+      summary += `Biggest risk this week: ${form.risk}. `;
+    }
+    if (form.support) {
+      summary += `Support needed from partner: ${form.support}.`;
+    }
+
+    setAiSummary(summary.trim());
+  };
+
+  const handleSubmit = () => onSubmit({ ...form, aiSummary });
+
+  const COACHING = {
+    1: { title: 'CEO Mindset', tip: <>Look at your Planner. What are the 3 things that, if completed this week, move the business forward most? <span className="identity">A CEO doesn't list tasks — they declare outcomes.</span> Think: "By Friday, what will be different because I led this week?"</> },
+    2: { title: 'Strategic Depth', tip: <>Outcomes 2 and 3 are optional but powerful. If you only have one focus this week, own it. <span className="identity">Fewer commitments done well beats a scattered list every time.</span></> },
+    3: { title: 'Leadership Rhythm', tip: <>Your non-negotiable meeting is the one you'd reschedule everything else for. <span className="identity">CEOs protect their calendar — they don't let it happen to them.</span> Your delegation commitment: what are you doing this week that someone at $25/hour should be doing instead?</> },
+    4: { title: 'Risk Awareness', tip: <>Name the thing most likely to derail you. <span className="identity">Saying it out loud is how CEOs stay ahead of problems instead of reacting to them.</span> What do you need from your partner this week to succeed?</> },
+    5: { title: 'Final Check', tip: <>Review everything. Does this contract represent <span className="identity">the work of a CEO running a $7M company, or a foreman managing a job site?</span> If anything feels like a task instead of an outcome, rewrite it.</> }
+  };
+
+  const PrioritySelector = ({ value, onChange }) => (
+    <div className="priority-pills">
+      {CONFIG.PRIORITIES.map(p => (
+        <div key={p.label} className={`priority-pill ${value === p.mondayLabel ? 'selected' : ''}`} data-color={p.color} onClick={() => onChange(p.mondayLabel)}>
+          {p.label}
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="form-card">
+      {/* Stepper */}
+      <div className="stepper">
+        {Array.from({ length: TOTAL }, (_, i) => i + 1).map(s => (
+          <React.Fragment key={s}>
+            <div className={`step-dot ${s === step ? 'active' : ''} ${s < step ? 'done' : ''}`}>
+              {s < step ? '✓' : s}
+            </div>
+            {s < TOTAL && <div className={`step-line ${s < step ? 'done' : ''}`} />}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Step Content */}
+      {step <= 5 && COACHING[step] && (
+        <div style={{ padding: '20px 28px 0' }}>
+          <div className="coach-tip"><strong>{COACHING[step].title}:</strong> {COACHING[step].tip}</div>
+        </div>
+      )}
+
+      {step === 1 && (
+        <>
+          <div className="form-header">
+            <div className="step-label">Step 1 of {TOTAL}</div>
+            <h3>Primary Outcome</h3>
+            <p>What is the single most important thing you will deliver this week?</p>
+          </div>
+          <div className="form-body">
+            <div className="form-group">
+              <label>Strategic Priority Alignment</label>
+              <PrioritySelector value={form.o1Priority} onChange={v => set('o1Priority', v)} />
+            </div>
+            <div className="form-group">
+              <label>Outcome 1 *</label>
+              <div className="hint">Write as an outcome, not a task. "Close the Henderson deal" not "Work on Henderson quote"</div>
+              <VoiceInput value={form.outcome1} onChange={v => set('outcome1', v)} placeholder="By Friday, I will have..." fieldName="Primary Outcome" multiline />
+            </div>
+          </div>
+        </>
+      )}
+
+      {step === 2 && (
+        <>
+          <div className="form-header">
+            <div className="step-label">Step 2 of {TOTAL}</div>
+            <h3>Additional Outcomes (Optional)</h3>
+            <p>Add up to two more outcomes if you have bandwidth this week.</p>
+          </div>
+          <div className="form-body">
+            <div className="form-group">
+              <label>Outcome 2 Priority</label>
+              <PrioritySelector value={form.o2Priority} onChange={v => set('o2Priority', v)} />
+            </div>
+            <div className="form-group">
+              <label>Outcome 2</label>
+              <VoiceInput value={form.outcome2} onChange={v => set('outcome2', v)} placeholder="Optional second outcome..." fieldName="Outcome 2" multiline />
+            </div>
+            <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '20px 0' }} />
+            <div className="form-group">
+              <label>Outcome 3 Priority</label>
+              <PrioritySelector value={form.o3Priority} onChange={v => set('o3Priority', v)} />
+            </div>
+            <div className="form-group">
+              <label>Outcome 3</label>
+              <VoiceInput value={form.outcome3} onChange={v => set('outcome3', v)} placeholder="Optional third outcome..." fieldName="Outcome 3" multiline />
+            </div>
+          </div>
+        </>
+      )}
+
+      {step === 3 && (
+        <>
+          <div className="form-header">
+            <div className="step-label">Step 3 of {TOTAL}</div>
+            <h3>Meeting & Delegation</h3>
+            <p>Protect your most important meeting. Commit to delegating one thing.</p>
+          </div>
+          <div className="form-body">
+            <div className="form-group">
+              <label>Non-Negotiable Meeting</label>
+              <div className="hint">The one meeting this week you would reschedule everything else for</div>
+              <VoiceInput value={form.meeting} onChange={v => set('meeting', v)} placeholder="e.g., Friday production planning with John" fieldName="Non-Negotiable Meeting" />
+            </div>
+            <div className="form-group">
+              <label>Delegation Commitment</label>
+              <div className="hint">What task are you handing off, to whom, and by when?</div>
+              <VoiceInput value={form.delegation} onChange={v => set('delegation', v)} placeholder="e.g., Delegate weekly invoice reconciliation to Taylor by Wednesday" fieldName="Delegation Commitment" multiline />
+            </div>
+          </div>
+        </>
+      )}
+
+      {step === 4 && (
+        <>
+          <div className="form-header">
+            <div className="step-label">Step 4 of {TOTAL}</div>
+            <h3>Risk & Support</h3>
+            <p>Name what could go wrong. Ask for what you need.</p>
+          </div>
+          <div className="form-body">
+            <div className="form-group">
+              <label>Biggest Risk This Week</label>
+              <div className="hint">What's the single biggest thing that could derail your outcomes?</div>
+              <VoiceInput value={form.risk} onChange={v => set('risk', v)} placeholder="e.g., Plumber no-show on the Henderson job delays framing" fieldName="Biggest Risk" />
+            </div>
+            <div className="form-group">
+              <label>Partner Support Needed</label>
+              <div className="hint">What do you need from {partner === 'Conrad' ? 'Ben' : 'Conrad'} this week?</div>
+              <VoiceInput value={form.support} onChange={v => set('support', v)} placeholder="e.g., Need Ben to confirm the McCullough scope by Wednesday" fieldName="Partner Support" multiline />
+            </div>
+          </div>
+        </>
+      )}
+
+      {step === 5 && (
+        <>
+          <div className="form-header">
+            <div className="step-label">Step 5 of {TOTAL}</div>
+            <h3>Quick Reflection</h3>
+            <p>Take 30 seconds. Does this contract represent CEO-level work?</p>
+          </div>
+          <div className="form-body">
+            <div style={{ background: '#f9fafb', borderRadius: 8, padding: 16, marginBottom: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 4 }}>YOUR OUTCOMES</div>
+              <div style={{ fontSize: 15, color: '#1f2937', lineHeight: 1.5 }}>
+                <div>1. {form.outcome1 || <span style={{ color: '#d1d5db' }}>Not set</span>}</div>
+                {form.outcome2 && <div>2. {form.outcome2}</div>}
+                {form.outcome3 && <div>3. {form.outcome3}</div>}
+              </div>
+            </div>
+            <div style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.6 }}>
+              If anything reads like a task instead of an outcome, go back and rewrite it. You can use the back button to edit any step.
+            </div>
+          </div>
+        </>
+      )}
+
+      {step === 6 && (
+        <>
+          <div className="form-header">
+            <div className="step-label">Step 6 of {TOTAL}</div>
+            <h3>Review & Submit</h3>
+            <p>Confirm your weekly contract. This will be submitted to Bruce for Friday review.</p>
+          </div>
+          <div className="form-body">
+            {[
+              { label: 'Outcome 1', value: form.outcome1, priority: form.o1Priority },
+              { label: 'Outcome 2', value: form.outcome2, priority: form.o2Priority },
+              { label: 'Outcome 3', value: form.outcome3, priority: form.o3Priority },
+            ].filter(o => o.value).map((o, i) => (
+              <div key={i} className="review-section">
+                <div className="r-label">{o.label}</div>
+                {o.priority && <div className="r-priority" style={{ background: CONFIG.PRIORITIES.find(p => p.mondayLabel === o.priority)?.hex || '#143d59' }}>{o.priority}</div>}
+                <div className="r-value">{o.value}</div>
+              </div>
+            ))}
+            {form.meeting && <div className="review-section"><div className="r-label">Non-Negotiable Meeting</div><div className="r-value">{form.meeting}</div></div>}
+            {form.delegation && <div className="review-section"><div className="r-label">Delegation</div><div className="r-value">{form.delegation}</div></div>}
+            {form.risk && <div className="review-section"><div className="r-label">Biggest Risk</div><div className="r-value">{form.risk}</div></div>}
+            {form.support && <div className="review-section"><div className="r-label">Partner Support</div><div className="r-value">{form.support}</div></div>}
+
+            <div className="ai-summary-box">
+              <h4>📋 Weekly Contract Summary</h4>
+              {aiSummary ? (
+                <p style={{ whiteSpace: 'pre-line', lineHeight: 1.7 }}>{aiSummary}</p>
+              ) : (
+                <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>Summary will appear here after review.</p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Navigation */}
+      <div className="btn-row">
+        {step === 1 ? (
+          <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
+        ) : (
+          <button className="btn btn-ghost" onClick={goBack}>← Back</button>
+        )}
+        {step < TOTAL ? (
+          <button className="btn btn-primary" onClick={goNext} disabled={!canNext()}>
+            Next →
+          </button>
+        ) : (
+          <button className="btn btn-gold" onClick={handleSubmit} disabled={submitting}>
+            {submitting ? <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2, borderTopColor: '#143d59', borderColor: 'rgba(20,61,89,.2)' }} /> Submitting...</> : '✓ Submit Contract'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
+// OWNER GRADING VIEW (tentative entries)
+// ════════════════════════════════════════
+function GradingView({ partner, showToast }) {
+  const other = partner === 'Conrad' ? 'Ben' : 'Conrad';
+  const [week, setWeek] = useState(getMonday());
+  const [weeksList, setWeeksList] = useState([getMonday()]);
+  const [finalized, setFinalized] = useState(false);
+  const [serverAreas, setServerAreas] = useState(null);
+  const [form, setForm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState('');
+
+  const myAreas = GRADING.AREAS.filter(a => a.owner === partner);
+  const theirAreas = GRADING.AREAS.filter(a => a.grader === partner);
+
+  const load = useCallback(async (w) => {
+    setLoading(true);
+    setLoadError('');
+    try {
+      const data = await gradingGET(w);
+      setServerAreas(data.areas || {});
+      setFinalized(!!data.finalized);
+      const list = [...new Set([getMonday(), ...(data.weeks || [])])].sort().reverse();
+      setWeeksList(list);
+      const f = {};
+      GRADING.AREAS.forEach(a => {
+        const e = (data.areas || {})[a.id] || {};
+        f[a.id] = { keyNumber: e.keyNumber || '', grade: e.grade || '', status: e.status || '', reason: e.reason || '', forwardCommitment: e.forwardCommitment || '' };
+      });
+      setForm(f);
+    } catch (err) {
+      setLoadError(err.message);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(week); }, [week, load]);
+
+  const set = (areaId, field, val) => setForm(prev => ({ ...prev, [areaId]: { ...prev[areaId], [field]: val } }));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const areas = {};
+      myAreas.forEach(a => { areas[a.id] = { keyNumber: form[a.id].keyNumber }; });
+      theirAreas.forEach(a => {
+        const f = form[a.id];
+        areas[a.id] = { grade: f.grade, status: f.status, reason: f.reason, forwardCommitment: f.forwardCommitment };
+      });
+      await gradingPOST({ week, by: partner, areas });
+      showToast('Saved. Grades stay tentative until Bruce finalizes them at the meeting.', 'success');
+      await load(week);
+    } catch (err) {
+      showToast('Save failed: ' + err.message, 'error');
+    }
+    setSaving(false);
+  };
+
+  if (loadError) return (
+    <div className="empty-state">
+      <div className="icon">⚠️</div>
+      <p>Could not load grading: {loadError}</p>
+      <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => load(week)}>Try again</button>
+    </div>
+  );
+  if (loading || !form) return <div className="empty-state"><div className="spinner" /><p style={{ marginTop: 16 }}>Loading grading…</p></div>;
+
+  const StateBadge = ({ e }) => (
+    <span className={`state-badge ${e.state === 'final' ? 'final' : 'tentative'}`}>{e.state === 'final' ? 'Final' : 'Tentative'}</span>
+  );
+
+  return (
+    <div style={{ maxWidth: 760, margin: '0 auto' }}>
+      <div className="grading-head">
+        <h3>Weekly Grading</h3>
+        <select className="week-select" value={week} onChange={e => setWeek(e.target.value)}>
+          {weeksList.map(w => <option key={w} value={w}>Week of {formatWeek(w)}</option>)}
+        </select>
+      </div>
+      <p style={{ fontSize: 13, color: 'var(--g500)', margin: '-8px 0 16px', lineHeight: 1.5 }}>
+        Grades measure each area's output, not the person. On track / off track is independent of the letter — it asks whether the area is moving toward an A.
+      </p>
+
+      {finalized && <div className="final-banner">✓ This week has been finalized by Bruce and is live on the Partnership Scoreboard. Changes now go through him.</div>}
+
+      <div className="section-label">Your areas — report this week's key number</div>
+      {myAreas.map(a => { const e = (serverAreas || {})[a.id] || {}; return (
+        <div className="grade-card" key={a.id}>
+          <h4>{a.name} <span className={`grade-owner-tag ${a.owner.toLowerCase()}`}>{a.owner}</span> <StateBadge e={e} /></h4>
+          <div className="admin-field" style={{ marginTop: 10 }}>
+            <label>Key number — your reported number for this area</label>
+            {finalized
+              ? <div style={{ fontSize: 14 }}>{e.keyNumber || '—'}</div>
+              : <VoiceInput value={form[a.id].keyNumber} onChange={v => set(a.id, 'keyNumber', v)} placeholder="e.g., 41 of 60 leads this month" fieldName="Key number" />}
+          </div>
+          {(e.grade || e.status) && (
+            <div className="grade-meta">{other}'s grade so far: <strong>{e.grade || '—'}</strong>{e.status ? ' · ' + e.status : ''}{e.reason ? ' — ' + e.reason : ''}</div>
+          )}
+        </div>
+      ); })}
+
+      <div className="section-label">Grade {other}'s areas</div>
+      {theirAreas.map(a => { const e = (serverAreas || {})[a.id] || {}; const f = form[a.id]; return (
+        <div className="grade-card" key={a.id}>
+          <h4>{a.name} <span className={`grade-owner-tag ${a.owner.toLowerCase()}`}>{a.owner}</span> <StateBadge e={e} /></h4>
+          {e.keyNumber && <div className="grade-meta" style={{ marginTop: 4 }}>{other}'s key number: <strong>{e.keyNumber}</strong></div>}
+          {finalized ? (
+            <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.6 }}>
+              <div><span className="grade-display">{e.grade || '—'}</span>{e.status ? <span style={{ marginLeft: 10 }}>{e.status}</span> : null}</div>
+              {e.reason && <div><strong>Reason:</strong> {e.reason}</div>}
+              {e.forwardCommitment && <div><strong>Forward commitment:</strong> {e.forwardCommitment}</div>}
+            </div>
+          ) : (
+            <>
+              <div className="admin-field" style={{ marginTop: 12 }}>
+                <label>Grade</label>
+                <div className="grade-pills">
+                  {GRADING.GRADES.map(g => (
+                    <div key={g} className={`grade-pill ${f.grade === g ? 'selected' : ''}`} onClick={() => set(a.id, 'grade', f.grade === g ? '' : g)}>{g}</div>
+                  ))}
+                </div>
+              </div>
+              <div className="admin-field" style={{ marginTop: 12 }}>
+                <label>Status — is it moving toward an A?</label>
+                <div className="status-pills">
+                  {GRADING.STATUSES.map(s => (
+                    <div key={s} className={`status-pill ${s === 'On track' ? 'on' : 'off'} ${f.status === s ? 'selected' : ''}`} onClick={() => set(a.id, 'status', f.status === s ? '' : s)}>{s}</div>
+                  ))}
+                </div>
+              </div>
+              <div className="admin-field" style={{ marginTop: 12 }}>
+                <label>Reason for the grade</label>
+                <VoiceInput value={f.reason} onChange={v => set(a.id, 'reason', v)} placeholder="What did the output look like this week?" fieldName="Reason" multiline />
+              </div>
+              <div className="admin-field" style={{ marginTop: 12 }}>
+                <label>Forward commitment — what would move this to an A?</label>
+                <VoiceInput value={f.forwardCommitment} onChange={v => set(a.id, 'forwardCommitment', v)} placeholder="The specific move that lifts this area..." fieldName="Forward commitment" multiline />
+              </div>
+            </>
+          )}
+        </div>
+      ); })}
+
+      {!finalized && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '20px 0 40px' }}>
+          <button className="btn btn-gold" onClick={save} disabled={saving}>
+            {saving ? 'Saving…' : '✓ Save tentative grades'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
+// ADMIN (BRUCE) — PASSCODE GATE + FINALIZE
+// The passcode is checked server-side on every request; nothing is
+// gated client-side only and no passcode is stored in this file.
+// ════════════════════════════════════════
+function AdminGate({ onAuthed, onBack }) {
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const submit = async () => {
+    if (!code.trim() || busy) return;
+    setBusy(true); setErr('');
+    try {
+      await finalizeAPI({ passcode: code, action: 'check' });
+      onAuthed(code);
+    } catch (e) { setErr(e.message); }
+    setBusy(false);
+  };
+  return (
+    <div className="login-wrap">
+      <div className="login-card">
+        <h1>NUVO</h1>
+        <div className="sub">Coach Finalize</div>
+        <div className="gold-line" />
+        <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 16 }}>Enter the finalize passcode</p>
+        <input type="password" className="form-input" style={{ width: '100%', padding: '12px 14px', border: '2px solid #e5e7eb', borderRadius: 8 }} value={code}
+          onChange={e => setCode(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') submit(); }} placeholder="Passcode" autoFocus />
+        {err && <div style={{ color: '#dc2626', fontSize: 13, marginTop: 10 }}>{err}</div>}
+        <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 16 }} onClick={submit} disabled={busy || !code.trim()}>
+          {busy ? 'Checking…' : 'Continue'}
+        </button>
+        <button className="coach-link" onClick={onBack}>← Back</button>
+      </div>
+    </div>
+  );
+}
+
+function AdminFinalize({ passcode, onExit }) {
+  const [week, setWeek] = useState(getMonday());
+  const [weeksList, setWeeksList] = useState([getMonday()]);
+  const [doc, setDoc] = useState(null);
+  const [form, setForm] = useState(null);
+  const [sysCheck, setSysCheck] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = 'info') => setToast({ message, type });
+
+  const hydrate = (d) => {
+    setDoc(d);
+    setSysCheck(d.systemCheck || '');
+    const f = {};
+    GRADING.AREAS.forEach(a => {
+      const e = (d.areas || {})[a.id] || {};
+      f[a.id] = { grade: e.grade || '', status: e.status || '', keyNumber: e.keyNumber || '', reason: e.reason || '', forwardCommitment: e.forwardCommitment || '', due: e.due || '', communicate: e.communicate || '', confirmed: e.confirmed === 'yes' };
+    });
+    setForm(f);
+  };
+
+  const load = useCallback(async (w) => {
+    setLoading(true);
+    try {
+      const data = await finalizeAPI({ passcode, action: 'check', week: w });
+      const list = [...new Set([getMonday(), ...(data.weeks || [])])].sort().reverse();
+      setWeeksList(list);
+      hydrate(data.week);
+    } catch (err) { showToast(err.message, 'error'); }
+    setLoading(false);
+  }, [passcode]);
+
+  useEffect(() => { load(week); }, [week, load]);
+
+  const set = (areaId, field, val) => setForm(prev => ({ ...prev, [areaId]: { ...prev[areaId], [field]: val } }));
+
+  const payload = () => {
+    const areas = {};
+    GRADING.AREAS.forEach(a => {
+      const f = form[a.id];
+      areas[a.id] = { grade: f.grade, status: f.status, keyNumber: f.keyNumber, reason: f.reason, forwardCommitment: f.forwardCommitment, due: f.due, communicate: f.communicate, confirmed: f.confirmed ? 'yes' : 'no' };
+    });
+    return { passcode, week, areas, systemCheck: sysCheck };
+  };
+
+  const saveDraft = async () => {
+    setBusy(true);
+    try {
+      const r = await finalizeAPI({ ...payload(), action: 'save' });
+      hydrate(r.week);
+      showToast('Draft saved.', 'success');
+    } catch (err) { showToast('Save failed: ' + err.message, 'error'); }
+    setBusy(false);
+  };
+  const submitFinal = async () => {
+    if (!window.confirm('Submit FINAL for the week of ' + formatWeek(week) + '? This publishes the grades to the public scoreboard.')) return;
+    setBusy(true);
+    try {
+      const r = await finalizeAPI({ ...payload(), action: 'final' });
+      hydrate(r.week);
+      showToast('Finalized — live on the public scoreboard.', 'success');
+    } catch (err) { showToast('Finalize failed: ' + err.message, 'error'); }
+    setBusy(false);
+  };
+
+  const isFinal = doc && Object.values(doc.areas || {}).some(x => x.state === 'final');
+
+  return (
+    <div className="shell">
+      <div className="topbar">
+        <div className="brand"><span className="mark">NUVO</span> Operating Rhythm</div>
+        <div className="topbar-right">
+          <div className="user-pill"><div className="dot" />Bruce — Coach</div>
+          <button className="logout-btn" onClick={onExit}>Sign Out</button>
+        </div>
+      </div>
+      <div className="content">
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
+          <div className="grading-head">
+            <h3>Finalize</h3>
+            <select className="week-select" value={week} onChange={e => setWeek(e.target.value)}>
+              {weeksList.map(w => <option key={w} value={w}>Week of {formatWeek(w)}</option>)}
+            </select>
+          </div>
+          {isFinal && <div className="final-banner">✓ This week is FINAL and live on the public scoreboard. You can still edit and re-submit.</div>}
+          {loading || !form ? (
+            <div className="empty-state"><div className="spinner" /><p style={{ marginTop: 16 }}>Loading…</p></div>
+          ) : (
+            <>
+              {GRADING.AREAS.map(a => { const f = form[a.id]; const e = (doc.areas || {})[a.id] || {}; return (
+                <div className="grade-card" key={a.id}>
+                  <h4>{a.name}
+                    <span className={`grade-owner-tag ${a.owner.toLowerCase()}`}>{a.owner} · graded by {a.grader}</span>
+                    <span className={`state-badge ${e.state === 'final' ? 'final' : 'tentative'}`}>{e.state === 'final' ? 'Final' : 'Tentative'}</span>
+                  </h4>
+                  {e.updatedBy && <div className="grade-meta">Last entry by {e.updatedBy}</div>}
+                  <div className="admin-field" style={{ marginTop: 12 }}>
+                    <label>Grade</label>
+                    <div className="grade-pills">
+                      {GRADING.GRADES.map(g => (
+                        <div key={g} className={`grade-pill ${f.grade === g ? 'selected' : ''}`} onClick={() => set(a.id, 'grade', f.grade === g ? '' : g)}>{g}</div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="admin-grid">
+                    <div className="admin-field">
+                      <label>Status</label>
+                      <div className="status-pills">
+                        {GRADING.STATUSES.map(s => (
+                          <div key={s} className={`status-pill ${s === 'On track' ? 'on' : 'off'} ${f.status === s ? 'selected' : ''}`} onClick={() => set(a.id, 'status', f.status === s ? '' : s)}>{s}</div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="admin-field">
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 24, cursor: 'pointer' }}>
+                        <input type="checkbox" checked={f.confirmed} onChange={ev => set(a.id, 'confirmed', ev.target.checked)} style={{ width: 18, height: 18, accentColor: '#059669' }} />
+                        Confirmed in meeting
+                      </label>
+                    </div>
+                  </div>
+                  <div className="admin-field" style={{ marginTop: 12 }}>
+                    <label>Key number</label>
+                    <input className="form-input" value={f.keyNumber} onChange={ev => set(a.id, 'keyNumber', ev.target.value)} />
+                  </div>
+                  <div className="admin-grid">
+                    <div className="admin-field">
+                      <label>Reason</label>
+                      <textarea className="form-input" rows={2} value={f.reason} onChange={ev => set(a.id, 'reason', ev.target.value)} />
+                    </div>
+                    <div className="admin-field">
+                      <label>Forward commitment (to an A)</label>
+                      <textarea className="form-input" rows={2} value={f.forwardCommitment} onChange={ev => set(a.id, 'forwardCommitment', ev.target.value)} />
+                    </div>
+                    <div className="admin-field">
+                      <label>Due</label>
+                      <input className="form-input" value={f.due} onChange={ev => set(a.id, 'due', ev.target.value)} />
+                    </div>
+                    <div className="admin-field">
+                      <label>Communicate to</label>
+                      <input className="form-input" value={f.communicate} onChange={ev => set(a.id, 'communicate', ev.target.value)} />
+                    </div>
+                  </div>
+                </div>
+              ); })}
+
+              <div className="grade-card">
+                <h4>System check — weekly note (yours only, never published)</h4>
+                <textarea className="form-input" rows={3} style={{ marginTop: 10 }} value={sysCheck} onChange={ev => setSysCheck(ev.target.value)} placeholder="How did the operating rhythm itself run this week?" />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, margin: '20px 0 40px' }}>
+                <button className="btn btn-ghost" onClick={saveDraft} disabled={busy}>Save draft</button>
+                <button className="btn btn-gold" onClick={submitFinal} disabled={busy}>{busy ? 'Working…' : '✓ Submit final'}</button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+      <Toast message={toast?.message} type={toast?.type} onClose={() => setToast(null)} />
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
+// MAIN APP
+// ════════════════════════════════════════
+function App() {
+  const [partner, setPartner] = useState(null);
+  const [view, setView] = useState('dashboard');
+  const [items, setItems] = useState([]);
+  const [itemsByPartner, setItemsByPartner] = useState({ Conrad: [], Ben: [] });
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [envOk, setEnvOk] = useState(true);
+  const [adminMode, setAdminMode] = useState('none'); // none | gate | in
+  const [adminPass, setAdminPass] = useState('');
+
+  const showToast = (message, type = 'info') => setToast({ message, type });
+
+  const fetchItems = useCallback(async () => {
+    if (!partner) return;
+    setLoading(true);
+    try {
+      const fetchGroup = async (groupId) => {
+        const result = await mondayAPI(`{
+          boards(ids: ${CONFIG.BOARD_ID}) {
+            groups(ids: "${groupId}") {
+              items_page(limit: 50) {
+                items {
+                  id name
+                  column_values { id text value }
+                }
+              }
+            }
+          }
+        }`);
+        const group = result?.data?.boards?.[0]?.groups?.[0];
+        return group?.items_page?.items || [];
+      };
+      const [conradItems, benItems] = await Promise.all([
+        fetchGroup(CONFIG.PARTNERS.Conrad.group),
+        fetchGroup(CONFIG.PARTNERS.Ben.group)
+      ]);
+      const ownItems = partner === 'Conrad' ? conradItems : benItems;
+      console.log(`Fetched ${conradItems.length} Conrad items, ${benItems.length} Ben items`);
+      setItemsByPartner({ Conrad: conradItems, Ben: benItems });
+      setItems(ownItems);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      if (err.message?.includes('fetch') || err.message?.includes('proxy')) setEnvOk(false);
+    }
+    setLoading(false);
+  }, [partner]);
+
+  useEffect(() => { if (partner) fetchItems(); }, [partner, fetchItems]);
+
+  const handleSubmit = async (formData) => {
+    setSubmitting(true);
+    try {
+      const weekOf = getMonday();
+      const p = CONFIG.PARTNERS[partner];
+      const cols = CONFIG.COLUMNS;
+
+      const columnValues = {
+        [cols.partner]: { ids: [p.dropdownId] },
+        [cols.weekOf]: { date: weekOf },
+        [cols.outcome1]: { text: formData.outcome1 },
+        [cols.o1Priority]: { label: formData.o1Priority },
+        [cols.meeting]: formData.meeting || '',
+        [cols.risk]: formData.risk || '',
+        [cols.status]: { label: 'Submitted' }
+      };
+      if (formData.outcome2) {
+        columnValues[cols.outcome2] = { text: formData.outcome2 };
+        if (formData.o2Priority) columnValues[cols.o2Priority] = { label: formData.o2Priority };
+      }
+      if (formData.outcome3) {
+        columnValues[cols.outcome3] = { text: formData.outcome3 };
+        if (formData.o3Priority) columnValues[cols.o3Priority] = { label: formData.o3Priority };
+      }
+      if (formData.delegation) columnValues[cols.delegation] = { text: formData.delegation };
+      if (formData.support) columnValues[cols.support] = { text: formData.support };
+      if (formData.aiSummary && formData.aiSummary !== '__skipped__' && !formData.aiSummary.startsWith('⚠')) columnValues[cols.aiSummary] = { text: formData.aiSummary };
+
+      const itemName = `${partner} — Week of ${formatWeek(weekOf)}`;
+
+      const result = await mondayAPI(`mutation ($boardId: ID!, $groupId: String!, $itemName: String!, $columnValues: JSON!) {
+        create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $columnValues) { id }
+      }`, {
+        boardId: String(CONFIG.BOARD_ID),
+        groupId: p.group,
+        itemName,
+        columnValues: JSON.stringify(columnValues)
+      });
+
+      // Verify the item was actually created
+      const createdId = result?.data?.create_item?.id;
+      if (!createdId) {
+        console.error('Submission response:', JSON.stringify(result));
+        throw new Error('Item was not created — no ID returned from Monday.com');
+      }
+      console.log('Contract created successfully, item ID:', createdId);
+
+      setSubmitted(true);
+      showToast('Contract submitted successfully!', 'success');
+      await fetchItems();
+    } catch (err) {
+      showToast('Submission failed: ' + err.message, 'error');
+    }
+    setSubmitting(false);
+  };
+
+  // Admin (Bruce) — passcode-gated finalize, separate from the owner flow
+  if (adminMode === 'gate') return <AdminGate onAuthed={code => { setAdminPass(code); setAdminMode('in'); }} onBack={() => setAdminMode('none')} />;
+  if (adminMode === 'in') return <AdminFinalize passcode={adminPass} onExit={() => { setAdminPass(''); setAdminMode('none'); }} />;
+
+  // Login
+  if (!partner) return <LoginScreen onSelect={setPartner} onCoach={() => setAdminMode('gate')} />;
+
+  return (
+    <div className="shell">
+      <div className="topbar">
+        <div className="brand"><span className="mark">NUVO</span> Operating Rhythm</div>
+        <div className="topbar-right">
+          <div className="user-pill"><div className="dot" />{partner === 'Conrad' ? 'Conrad Jones' : 'Ben Pond'}</div>
+          <button className="logout-btn" onClick={() => { setPartner(null); setView('dashboard'); setItems([]); setSubmitted(false); }}>Sign Out</button>
+        </div>
+      </div>
+
+      <div className="nav-tabs">
+        <div className={`nav-tab ${view === 'dashboard' ? 'active' : ''}`} onClick={() => { setView('dashboard'); setSubmitted(false); }}>Dashboard</div>
+        <div className={`nav-tab ${view === 'contract' ? 'active' : ''}`} onClick={() => { setView('contract'); setSubmitted(false); }}>New Contract</div>
+        <div className={`nav-tab ${view === 'grading' ? 'active' : ''}`} onClick={() => { setView('grading'); setSubmitted(false); }}>Grading</div>
+        <div className={`nav-tab ${view === 'history' ? 'active' : ''}`} onClick={() => setView('history')}>History</div>
+      </div>
+
+      <div className="content">
+
+        {view === 'grading' && <GradingView partner={partner} showToast={showToast} />}
+
+        {view !== 'grading' && (loading ? (
+          <div className="empty-state"><div className="spinner" /><p style={{ marginTop: 16 }}>Loading from Monday.com…</p></div>
+        ) : (
+          <>
+            {view === 'dashboard' && !submitted && (
+              <DashboardView partner={partner} items={items} onNewContract={() => setView('contract')} loading={loading} />
+            )}
+            {view === 'contract' && !submitted && (
+              <ContractForm partner={partner} onSubmit={handleSubmit} submitting={submitting} onCancel={() => setView('dashboard')} />
+            )}
+            {view === 'contract' && submitted && (
+              <div className="success-screen">
+                <div className="success-icon">✓</div>
+                <h2>Contract Submitted</h2>
+                <p>Your weekly contract for the week of {formatWeek(getMonday())} has been submitted. Bruce will review it on Friday.</p>
+                <button className="btn btn-primary" onClick={() => { setSubmitted(false); setView('dashboard'); }}>Back to Dashboard</button>
+              </div>
+            )}
+            {view === 'history' && <HistoryView items={items} itemsByPartner={itemsByPartner} currentPartner={partner} />}
+          </>
+        ))}
+      </div>
+
+      <Toast message={toast?.message} type={toast?.type} onClose={() => setToast(null)} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

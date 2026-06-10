@@ -1,0 +1,8 @@
+{
+  "name": "nuvo-ops-rhythm",
+  "private": true,
+  "description": "Nuvo — Weekly Operating Rhythm app (static single-file React + Netlify Functions/Blobs)",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
