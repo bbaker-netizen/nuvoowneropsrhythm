@@ -1543,6 +1543,7 @@ function AdminFinalize({ passcode, onExit }) {
       <div className="topbar">
         <div className="brand"><span className="mark">NUVO</span> Operating Rhythm</div>
         <div className="topbar-right">
+          <a className="logout-btn" href="https://nuvoscorecard.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }} title="Open the public Partnership Scoreboard in a new tab">Scoreboard ↗</a>
           <div className="user-pill"><div className="dot" />Bruce — Coach</div>
           <button className="logout-btn" onClick={onExit}>Sign Out</button>
         </div>
@@ -1770,6 +1771,10 @@ function App() {
         <div className={`nav-tab ${view === 'contract' ? 'active' : ''}`} onClick={() => { setView('contract'); setSubmitted(false); }}>New Contract</div>
         <div className={`nav-tab ${view === 'grading' ? 'active' : ''}`} onClick={() => { setView('grading'); setSubmitted(false); }}>Grading</div>
         <div className={`nav-tab ${view === 'history' ? 'active' : ''}`} onClick={() => setView('history')}>History</div>
+        <a className="nav-tab" href="https://nuvoscorecard.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6 }} title="Open the public Partnership Scoreboard in a new tab">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="6" y1="20" x2="6" y2="12" /><line x1="12" y1="20" x2="12" y2="6" /><line x1="18" y1="20" x2="18" y2="15" /></svg>
+          Scoreboard ↗
+        </a>
       </div>
 
       <div className="content">
