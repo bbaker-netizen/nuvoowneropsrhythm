@@ -1521,6 +1521,10 @@ function AdminFinalize({ passcode, onExit }) {
     } catch (err) { showToast('Save failed: ' + err.message, 'error'); }
     setBusy(false);
   };
+  const reloadLatest = () => {
+    if (!window.confirm('Pull the latest saved entries for this week? Anything changed on this screen but not yet saved will be replaced.')) return;
+    load(week);
+  };
   const submitFinal = async () => {
     if (!window.confirm('Submit FINAL for the week of ' + formatWeek(week) + '? This publishes the grades to the public scoreboard.')) return;
     setBusy(true);
@@ -1547,9 +1551,12 @@ function AdminFinalize({ passcode, onExit }) {
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           <div className="grading-head">
             <h3>Finalize</h3>
-            <select className="week-select" value={week} onChange={e => setWeek(e.target.value)}>
-              {weeksList.map(w => <option key={w} value={w}>Week of {formatWeek(w)}</option>)}
-            </select>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <button className="btn btn-ghost" onClick={reloadLatest} disabled={busy || loading} title="Re-pull what Ben and Conrad have saved for this week">↻ Pull latest entries</button>
+              <select className="week-select" value={week} onChange={e => setWeek(e.target.value)}>
+                {weeksList.map(w => <option key={w} value={w}>Week of {formatWeek(w)}</option>)}
+              </select>
+            </div>
           </div>
           {isFinal && <div className="final-banner">✓ This week is FINAL and live on the public scoreboard. You can still edit and re-submit.</div>}
           {loading || !form ? (
