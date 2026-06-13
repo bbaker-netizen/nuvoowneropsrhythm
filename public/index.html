@@ -286,6 +286,9 @@ const { useState, useEffect, useRef, useCallback } = React;
 // ════════════════════════════════════════
 const CONFIG = {
   BOARD_ID: 18399091870,
+  // MS Planner board where physical commitments get added after the meeting.
+  // Leave '' to render the button in a clearly-marked "not set yet" state.
+  MS_PLANNER_URL: 'https://planner.cloud.microsoft/webui/plan/Bx4j56nrnU2Seu5wMGZ31n0AEzwx/view/board?tid=0c4fc0d5-5fcc-4625-97fd-6f9f10762e88',
   PARTNERS: {
     'Conrad': { id: '97207810', group: 'group_mm0a3p30', dropdownId: 0 },
     'Ben':    { id: '96669726', group: 'group_mm0afymh', dropdownId: 1 }
@@ -453,6 +456,9 @@ function gradingPOST(payload) {
 }
 function finalizeAPI(payload) {
   return gradingRequest('/api/finalize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }, 'Request failed');
+}
+function meetingsAPI() {
+  return gradingRequest('/api/meetings', undefined, 'Could not load meeting notes');
 }
 
 // ════════════════════════════════════════
@@ -1639,6 +1645,145 @@ function AdminFinalize({ passcode, onExit }) {
 }
 
 // ════════════════════════════════════════
+// MEETING NOTES & COMMITMENTS VIEW
+// Reads the finalized Wednesday meetings from /api/meetings and lays out,
+// per meeting, a short summary plus every forward commitment (due date and
+// who to communicate it to). A link sends owners to the MS Planner board
+// where each physical commitment is added to their planner.
+// ════════════════════════════════════════
+function PlannerButton({ block }) {
+  const url = (CONFIG.MS_PLANNER_URL || '').trim();
+  const icon = (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="17" rx="2" /><line x1="3" y1="9" x2="21" y2="9" />
+      <path d="M8 13l2.5 2.5L16 11" />
+    </svg>
+  );
+  if (!url) return (
+    <span className="sbs-print-btn" title="Paste the MS Planner board URL into CONFIG.MS_PLANNER_URL to enable this link"
+      style={{ background: 'var(--g100)', color: 'var(--g500)', cursor: 'not-allowed' }}>
+      {icon} MS Planner link — not set yet
+    </span>
+  );
+  return (
+    <a className="sbs-print-btn" href={url} target="_blank" rel="noopener noreferrer"
+       style={block ? { textDecoration: 'none' } : { textDecoration: 'none', display: 'inline-flex' }}>
+      {icon} Open MS Planner board ↗
+    </a>
+  );
+}
+
+function MeetingNotesView({ showToast }) {
+  const [meetings, setMeetings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState(null);
+
+  const load = useCallback(async () => {
+    setLoading(true); setError('');
+    try {
+      const data = await meetingsAPI();
+      const list = data.meetings || [];
+      setMeetings(list);
+      if (list.length) setExpanded(list[0].weekOf);
+    } catch (err) { setError(err.message); }
+    setLoading(false);
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  const gradeColor = (g) => {
+    if (!g) return 'var(--g400)';
+    if (g.startsWith('A')) return 'var(--green)';
+    if (g.startsWith('B')) return 'var(--gold-dark)';
+    return 'var(--red)';
+  };
+
+  if (error) return (
+    <div className="empty-state">
+      <div className="icon">⚠️</div>
+      <p>Could not load meeting notes: {error}</p>
+      <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={load}>Try again</button>
+    </div>
+  );
+  if (loading || meetings === null) return (
+    <div className="empty-state"><div className="spinner" /><p style={{ marginTop: 16 }}>Loading meeting notes…</p></div>
+  );
+
+  return (
+    <div style={{ maxWidth: 760, margin: '0 auto' }}>
+      <div className="grading-head">
+        <h3>Meeting Notes & Commitments</h3>
+        <PlannerButton />
+      </div>
+      <p style={{ fontSize: 13, color: 'var(--g500)', margin: '-8px 0 16px', lineHeight: 1.5 }}>
+        Each finalized Wednesday operating-rhythm meeting, summarized — with every forward commitment, its due date, and who it's to be communicated to. Add each physical commitment to your MS Planner board.
+      </p>
+
+      {!CONFIG.MS_PLANNER_URL && (
+        <div className="env-banner">
+          The MS Planner link isn't wired up yet. Paste the board URL into <strong>CONFIG.MS_PLANNER_URL</strong> at the top of the app and the button turns live everywhere it appears.
+        </div>
+      )}
+
+      {meetings.length === 0 ? (
+        <div className="empty-state">
+          <div className="icon">🗒️</div>
+          <p>No finalized meetings yet. Once Bruce finalizes a week, its notes and commitments appear here.</p>
+        </div>
+      ) : meetings.map(m => {
+        const isOpen = expanded === m.weekOf;
+        return (
+          <div className="grade-card" key={m.weekOf} style={{ padding: 0, overflow: 'hidden' }}>
+            <div onClick={() => setExpanded(isOpen ? null : m.weekOf)}
+              style={{ cursor: 'pointer', padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--navy)' }}>Week of {formatWeek(m.weekOf)}</div>
+                <div style={{ fontSize: 12, color: 'var(--g500)', marginTop: 4 }}>
+                  {m.reviewed} area{m.reviewed === 1 ? '' : 's'} reviewed
+                  {m.onTrack ? <> · <span style={{ color: 'var(--green)', fontWeight: 600 }}>{m.onTrack} on track</span></> : null}
+                  {m.offTrack ? <> · <span style={{ color: 'var(--red)', fontWeight: 600 }}>{m.offTrack} off track</span></> : null}
+                  {' · '}{m.commitments.length} commitment{m.commitments.length === 1 ? '' : 's'}
+                </div>
+              </div>
+              <span style={{ color: 'var(--g400)', fontSize: 18, transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform var(--ease)' }}>›</span>
+            </div>
+
+            {isOpen && (
+              <div style={{ borderTop: '1px solid var(--g100)', padding: '16px 22px 20px' }}>
+                {m.commitments.length === 0 ? (
+                  <div style={{ fontSize: 13, color: 'var(--g400)', fontStyle: 'italic' }}>No forward commitments recorded for this meeting.</div>
+                ) : m.commitments.map((c, i) => (
+                  <div key={i} style={{ padding: '14px 0', borderBottom: i < m.commitments.length - 1 ? '1px solid var(--g100)' : 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+                      <span className={`grade-owner-tag ${c.owner.toLowerCase()}`}>{c.owner}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--g700)' }}>{c.area}</span>
+                      {c.grade && <span style={{ fontSize: 13, fontWeight: 800, color: gradeColor(c.grade) }}>{c.grade}</span>}
+                      {c.status && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 8,
+                        background: c.status === 'On track' ? 'var(--green-light)' : 'var(--red-light)',
+                        color: c.status === 'On track' ? 'var(--green)' : 'var(--red)' }}>{c.status}</span>}
+                    </div>
+                    <div style={{ fontSize: 14, color: 'var(--g800)', lineHeight: 1.55 }}>{c.commitment}</div>
+                    {(c.due || c.communicate) && (
+                      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 6, fontSize: 12, color: 'var(--g500)' }}>
+                        {c.due && <span><strong style={{ color: 'var(--g600)' }}>Due:</strong> {c.due}</span>}
+                        {c.communicate && <span><strong style={{ color: 'var(--g600)' }}>Communicate to:</strong> {c.communicate}</span>}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                  <PlannerButton block />
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
 // MAIN APP
 // ════════════════════════════════════════
 function App() {
@@ -1770,6 +1915,7 @@ function App() {
         <div className={`nav-tab ${view === 'dashboard' ? 'active' : ''}`} onClick={() => { setView('dashboard'); setSubmitted(false); }}>Dashboard</div>
         <div className={`nav-tab ${view === 'contract' ? 'active' : ''}`} onClick={() => { setView('contract'); setSubmitted(false); }}>New Contract</div>
         <div className={`nav-tab ${view === 'grading' ? 'active' : ''}`} onClick={() => { setView('grading'); setSubmitted(false); }}>Grading</div>
+        <div className={`nav-tab ${view === 'meetings' ? 'active' : ''}`} onClick={() => { setView('meetings'); setSubmitted(false); }}>Meeting Notes</div>
         <div className={`nav-tab ${view === 'history' ? 'active' : ''}`} onClick={() => setView('history')}>History</div>
         <a className="nav-tab" href="https://nuvoscorecard.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6 }} title="Open the public Partnership Scoreboard in a new tab">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="6" y1="20" x2="6" y2="12" /><line x1="12" y1="20" x2="12" y2="6" /><line x1="18" y1="20" x2="18" y2="15" /></svg>
@@ -1780,8 +1926,9 @@ function App() {
       <div className="content">
 
         {view === 'grading' && <GradingView partner={partner} showToast={showToast} />}
+        {view === 'meetings' && <MeetingNotesView showToast={showToast} />}
 
-        {view !== 'grading' && (loading ? (
+        {view !== 'grading' && view !== 'meetings' && (loading ? (
           <div className="empty-state"><div className="spinner" /><p style={{ marginTop: 16 }}>Loading from Monday.com…</p></div>
         ) : (
           <>

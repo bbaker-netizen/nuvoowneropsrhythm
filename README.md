@@ -10,6 +10,7 @@ Single-file React app (React 18 + babel-standalone, no build step) plus Netlify 
 - **Weekly grading** (Grading tab) — each owner reports the key number for his OWN areas and grades only the OTHER owner's areas (A+ to C-, on/off track, reason, forward commitment). Saves as `tentative`. Grades measure each area's output, not the person; on/off track is independent of the letter.
 - **Coach finalize** (link on the login screen) — Bruce's passcode-gated screen. Every field of every area is editable live in the Wednesday meeting, plus the private weekly system check. "Submit final" publishes the week. The passcode is checked server-side on every request.
 - **Public feed** — `/api/scoreboard` serves finalized grades only (area, grade, status, key number — never the comment fields). The Partnership Scoreboard at https://nuvoscorecard.netlify.app/ (repo `bbaker-netizen/nuvoscoreboard`) renders it live.
+- **Meeting Notes** (Meeting Notes tab) — for each finalized week, `/api/meetings` returns a short summary (areas reviewed, on/off-track counts) plus every forward commitment with its due date and who it's to be communicated to. The system check stays private (never returned), same as the owner grading reads. An "Open MS Planner board" link sends owners to the Planner where each physical commitment is added. Set the board URL in `CONFIG.MS_PLANNER_URL` at the top of `public/index.html` (empty renders a clearly-marked "not set yet" button).
 
 ## Layout
 
@@ -19,6 +20,7 @@ netlify/functions/
   grading.mjs                owner reads + tentative writes (enforces cross-grading)
   finalize.mjs               Bruce: check/save/final/delete, passcode from env var
   scoreboard.mjs             public read, final records only, CORS open
+  meetings.mjs               finalized-meeting notes + forward commitments (no system check)
   monday-proxy.mjs           forwards Monday.com GraphQL with the server-held token
 netlify.toml                 publish = public, functions dir
 ```
